@@ -58,18 +58,23 @@ class SpheroEduAPI:
 
     def __enter__(self):
         """Allow using SpheroEduAPI in a 'with' block (context manager)."""
-        # toy 연결 시작
-        self._toy.__enter__()  # sphero_unsw 내부의 BLE 연결 열기
-        print(f"✅ Connected to {self._toy.name}")
+        toy = getattr(self, "toy", None)
+        if toy is None:
+            raise AttributeError("No toy found in SpheroEduAPI instance.")
+        toy.__enter__()  # sphero_unsw 내부의 BLE 연결 열기
+        print(f"✅ Connected to {toy.name}")
         return self
     
     def __exit__(self, exc_type, exc_value, traceback):
         """Ensure proper disconnect when leaving the 'with' block."""
-        try:
-            self._toy.__exit__(exc_type, exc_value, traceback)
-            print(f"🧹 Disconnected from {self._toy.name}")
-        except Exception as e:
-            print(f"⚠️ Disconnect error: {e}")
+        toy = getattr(self, "toy", None)
+        if toy:
+            try:
+                toy.__exit__(exc_type, exc_value, traceback)
+                print(f"🧹 Disconnected from {toy.name}")
+            except Exception as e:
+                print(f"⚠️ Disconnect error: {e}")
+
 
 
 # ---------------------------
