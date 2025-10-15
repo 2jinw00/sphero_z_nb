@@ -56,6 +56,21 @@ class SpheroEduAPI:
         self.set_main_led(Color(255, 255, 255))
         print("✅ Sequence complete.")
 
+    def __enter__(self):
+        """Allow using SpheroEduAPI in a 'with' block (context manager)."""
+        # toy 연결 시작
+        self._toy.__enter__()  # sphero_unsw 내부의 BLE 연결 열기
+        print(f"✅ Connected to {self._toy.name}")
+        return self
+    
+    def __exit__(self, exc_type, exc_value, traceback):
+        """Ensure proper disconnect when leaving the 'with' block."""
+        try:
+            self._toy.__exit__(exc_type, exc_value, traceback)
+            print(f"🧹 Disconnected from {self._toy.name}")
+        except Exception as e:
+            print(f"⚠️ Disconnect error: {e}")
+
 
 # ---------------------------
 # 🔹 유틸리티 실행 도우미
