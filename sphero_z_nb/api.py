@@ -75,6 +75,31 @@ class SpheroEduAPI:
             except Exception as e:
                 print(f"⚠️ Disconnect error: {e}")
 
+    # -------------------
+    # 🔹 Heading 기반 이동
+    # -------------------
+    def drive_with_heading(self, heading: float, speed: int, duration: float = None):
+        """
+        Emulates heading-based motion using raw_motors().
+        0°: forward, 90°: right, 180°: back, 270°: left
+        """
+        heading = heading % 360
+        left = right = speed
+
+        if 45 < heading < 135:
+            left, right = speed, 0
+        elif 225 < heading < 315:
+            left, right = 0, speed
+        elif 135 <= heading <= 225:
+            left, right = -speed, -speed
+
+        print(f"🧭 Heading {heading}° → Raw motors (L={left}, R={right}) for {duration or 1.0}s")
+        self.raw_motors(left, right, duration or 1.0)
+
+        if duration:
+            time.sleep(duration)
+            self.stop_roll()
+
 
 
 # ---------------------------
